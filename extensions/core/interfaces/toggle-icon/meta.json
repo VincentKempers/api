@@ -10,6 +10,24 @@
       "comment": "Choose the inactive color",
       "default": "blue-grey",
       "interface": "text-input"
+    },
+    "colorB": {
+      "name": "Color B",
+      "comment": "Choose the active color",
+      "default": "yellow",
+      "interface": "text-input"
+    },
+    "iconInactive": {
+      "name": "Inactive icon",
+      "comment": "Pick your inactive icon",
+      "default": "star_border",
+      "interface": "text-input"
+    },
+    "iconActive": {
+      "name": "Active icon",
+      "comment": "Pick your active icon",
+      "default": "star",
+      "interface": "text-input"
     }
   },
   "translation": {

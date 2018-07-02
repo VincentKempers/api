@@ -24,7 +24,11 @@ export default {
 </script>
 
 <style type="scss" scoped>
-input:checked + label {
-  color: var(--yellow);
+div {
+  position: relative;
+}
+input {
+  position: absolute;
+  visibility: collapse;
 }
 </style>
