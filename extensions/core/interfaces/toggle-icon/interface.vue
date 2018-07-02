@@ -17,7 +17,8 @@ export default {
   mixins: [mixin],
   computed: {
     icon() {
-      return this.value ? "star" : "star_border";
+      console.log(this.options.iconInactive);
+      return this.value ? this.options.iconActive : this.options.iconInactive;
     }
   }
 };
