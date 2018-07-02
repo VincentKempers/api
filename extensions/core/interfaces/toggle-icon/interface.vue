@@ -24,13 +24,7 @@ export default {
 </script>
 
 <style type="scss" scoped>
-div {
-  input {
-  }
-  label {
-    i {
-      fill: yellow;
-    }
-  }
+input:checked + label {
+  color: var(--yellow);
 }
 </style>
