@@ -5,6 +5,12 @@
     "BOOLEAN": null
   },
   "options": {
+    "colorA": {
+      "name": "Color A",
+      "comment": "Choose the inactive color",
+      "default": "blue-grey",
+      "interface": "text-input"
+    }
   },
   "translation": {
     "en-US": {

@@ -4,7 +4,7 @@
 		type="checkbox"
 		:id="icon-toggle"
 		@click="$emit('input', !value)">
-		<label :for="icon-toggle">
+		<label :for="icon-toggle" :style="{ color: `var(--${options.colorA})` }">
 			<i class="material-icons">{{ icon }}</i>
 		</label>
 	</div>
