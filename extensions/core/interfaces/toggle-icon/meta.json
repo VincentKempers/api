@@ -1,0 +1,14 @@
+{
+  "name": "$t:toggle",
+  "version": "1.0.0",
+  "datatypes": {
+    "BOOLEAN": null
+  },
+  "options": {
+  },
+  "translation": {
+    "en-US": {
+      "toggle": "Toggle icon"
+    }
+  }
+}

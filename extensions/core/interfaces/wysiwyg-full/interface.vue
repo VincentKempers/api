@@ -1,4 +1,4 @@
-w<template>
+<template>
   <div ref="editor" class="interface-wysiwyg">{{ value }}</div>
 </template>
 

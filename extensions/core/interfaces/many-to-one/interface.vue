@@ -1,5 +1,6 @@
 <template>
   <v-select
+    class="normal"
     :name="name"
     :id="name"
     :placeholder="options.placeholder"
