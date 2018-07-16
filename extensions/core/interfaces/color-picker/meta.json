@@ -1,0 +1,20 @@
+{
+    "name": "$t:color",
+    "version": "1.0.0",
+    "datatypes": {
+        "BOOLEAN": null
+    },
+    "options": {
+        "colors": {
+            "name": "green",
+            "comment": "Choose the active color",
+            "default": "green",
+            "interface": "radio-buttons"
+        }
+    },
+    "translation": {
+        "en-US": {
+            "toggle": "Color picker"
+        }
+    }
+}
