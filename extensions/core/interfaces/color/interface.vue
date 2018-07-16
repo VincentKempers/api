@@ -156,27 +156,28 @@
     <button
       v-if="readonly === false"
       v-for="color in palette"
+      :key="color"
       :style="{ borderColor: color, color: color, backgroundColor: color }"
       @click="setRawValue(color)"><i class="material-icons">colorize</i></button>
   </div>
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
-import Color from 'color';
+import mixin from "../../../mixins/interface";
+import Color from "color";
 
 export default {
-  name: 'interface-color',
+  name: "interface-color",
   mixins: [mixin],
   data() {
     return {
-      rawValue: null,
+      rawValue: null
     };
   },
   computed: {
     color() {
       try {
-        if (this.options.input === 'hex') {
+        if (this.options.input === "hex") {
           return Color(this.rawValue);
         }
         return Color[this.options.input](this.rawValue);
@@ -186,12 +187,12 @@ export default {
     },
     palette() {
       if (this.options.palette) {
-        const rawPalette = Array.isArray(this.options.palette) ?
-          this.options.palette :
-          this.options.palette.split(',');
+        const rawPalette = Array.isArray(this.options.palette)
+          ? this.options.palette
+          : this.options.palette.split(",");
         return rawPalette.map(val => Color(val));
       }
-    },
+    }
   },
   created() {
     this.setDefault();
@@ -199,12 +200,12 @@ export default {
   watch: {
     rawValue() {
       if (this.color === null) {
-        return this.$emit('input', null);
+        return this.$emit("input", null);
       }
 
       let value;
 
-      if (this.options.output === 'hex') {
+      if (this.options.output === "hex") {
         value = this.color.hex();
       } else {
         value = this.color[this.options.output]().array();
@@ -217,33 +218,32 @@ export default {
         });
       }
 
-      this.$emit('input', value);
+      this.$emit("input", value);
     },
     options: {
       deep: true,
       handler() {
         this.setDefault();
-      },
-    },
+      }
+    }
   },
   methods: {
     setDefault() {
-      let savedColor = Color(this.value || '#000');
+      let savedColor = Color(this.value || "#000");
       this.setRawValue(savedColor);
     },
     setRawValue(color) {
-      if (this.options.input === 'hex') {
-        return this.rawValue = color.hex();
+      if (this.options.input === "hex") {
+        return (this.rawValue = color.hex());
       }
 
-      return this.rawValue = color[this.options.input]().array();
-    },
-  },
-}
+      return (this.rawValue = color[this.options.input]().array());
+    }
+  }
+};
 </script>
 
 <style scoped lang="scss">
-
 .input {
   max-width: 100px;
   display: inline-block;
@@ -295,13 +295,13 @@ button {
   &:first-of-type {
     margin-left: 16px;
     &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -16px;
-        border-left: 1px solid var(--lighter-gray);
-      }
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: -16px;
+      border-left: 1px solid var(--lighter-gray);
+    }
   }
   &:not(:hover) {
     background-color: var(--white) !important;

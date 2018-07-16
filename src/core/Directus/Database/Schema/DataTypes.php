@@ -10,7 +10,6 @@ final class DataTypes
     const TYPE_TEXT         = 'text';
     const TYPE_MEDIUM_TEXT  = 'mediumtext';
     const TYPE_LONGTEXT     = 'longtext';
-    const TYPE_CSV          = 'csv';
     const TYPE_UUID         = 'uuid';
     const TYPE_ARRAY        = 'array';
     const TYPE_TINY_JSON    = 'tinyjson';
@@ -56,14 +55,16 @@ final class DataTypes
     const TYPE_GROUP        = 'group';
 
     const TYPE_FILE         = 'file';
-    const TYPE_TRANSLATION   = 'translation';
+    const TYPE_TRANSLATION  = 'translation';
 
-    const TYPE_STATUS        = 'status';
-    const TYPE_SORT          = 'sort';
+    const TYPE_PRIMARY_KEY       = 'primary_key';
+    const TYPE_STATUS            = 'status';
+
+    const TYPE_SORT              = 'sort';
     const TYPE_DATETIME_CREATED  = 'datetime_created';
     const TYPE_DATETIME_MODIFIED = 'datetime_modified';
-    const TYPE_USER_CREATED  = 'user_created';
-    const TYPE_USER_MODIFIED = 'user_modified';
+    const TYPE_USER_CREATED      = 'user_created';
+    const TYPE_USER_MODIFIED     = 'user_modified';
 
     /**
      * Returns a list all data types
@@ -100,7 +101,6 @@ final class DataTypes
             static::TYPE_TEXT,
             static::TYPE_MEDIUM_TEXT,
             static::TYPE_LONGTEXT,
-            static::TYPE_CSV,
             static::TYPE_UUID,
             static::TYPE_ARRAY
         ], static::getJSONTypes(), static::getListTypes());
@@ -259,6 +259,18 @@ final class DataTypes
     }
 
     /**
+     * Checks if the given type is a list type
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function isListType($type)
+    {
+        return in_array(strtolower($type), static::getListTypes());
+    }
+
+    /**
      * Returns a list of Binary data types
      *
      * @return array
@@ -355,13 +367,14 @@ final class DataTypes
     /**
      * Returns all the unique data types
      *
-     * Only one of these status can exists per collection
+     * Only one of these types can exists per collection
      *
      * @return array
      */
     public static function getUniqueTypes()
     {
         return array_merge([
+            static::TYPE_PRIMARY_KEY,
             static::TYPE_USER_CREATED,
             static::TYPE_USER_MODIFIED,
             static::TYPE_STATUS,
@@ -377,5 +390,72 @@ final class DataTypes
     public static function isUniqueType($type)
     {
         return in_array(strtolower($type), static::getUniqueTypes());
+    }
+
+    /**
+     * Returns all the type that allows different data types
+     *
+     * @return array
+     */
+    public static function getMultiDataTypeTypes()
+    {
+        return [
+            static::TYPE_PRIMARY_KEY,
+            static::TYPE_STATUS,
+        ];
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function isMultiDataTypeType($type)
+    {
+        return in_array(strtolower($type), static::getMultiDataTypeTypes());
+    }
+
+    /**
+     * Returns a list of types that requires a length
+     *
+     * @return array
+     */
+    public static function getLengthTypes()
+    {
+        return array_merge(
+            [
+                static::TYPE_CHAR,
+                static::TYPE_VARCHAR,
+                static::TYPE_UUID,
+                static::TYPE_ARRAY
+            ],
+            static::getListTypes(),
+            static::getNumericTypes(),
+            static::getListTypes()
+        );
+    }
+
+    /**
+     * Checks whether a type requires a length
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function isLengthType($type)
+    {
+        return in_array(strtolower($type), static::getLengthTypes());
+    }
+
+    /**
+     * Checks whether or not a given type exists
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function exists($type)
+    {
+        return in_array(strtolower($type), static::getAllTypes());
     }
 }

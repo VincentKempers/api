@@ -1,23 +1,32 @@
 <template>
-  <input
+  <v-input
     type="number"
-    :readonly="readonly"
-    :value="value"
-    @input="updateValue($event.target.value)"
     min="0"
-  />
+    :class="width"
+    :value="value"
+    :readonly="readonly"
+    :placeholder="options.placeholder"
+    :maxlength="+length"
+    :id="name"
+    :charactercount="options.showCharacterCount"
+    @input="updateValue" />
 </template>
 
 <script>
-import meta from './meta.json';
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
   methods: {
     updateValue(value) {
-      this.$emit('input', Number(value));
-    },
-  },
-}
+      this.$emit("input", Number(value));
+    }
+  }
+};
 </script>
+
+<style lang="scss" scoped>
+.v-input {
+  max-width: var(--width-x-small);
+}
+</style>

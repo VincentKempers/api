@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -30,11 +30,11 @@ export default {
     },
     displayValue() {
       if (this.value && this.options.localized) {
-        return this.$d(this.date, 'long');
+        return this.$d(this.date, "long");
       }
 
       return this.value;
-    },
-  },
+    }
+  }
 };
 </script>

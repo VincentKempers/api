@@ -24,6 +24,7 @@ use Directus\Database\Ddl\Column\TinyText;
 use Directus\Database\Ddl\Column\Uuid;
 use Directus\Database\Exception\FieldAlreadyHasUniqueKeyException;
 use Directus\Database\Exception\UnknownDataTypeException;
+use Directus\Exception\Exception;
 use Directus\Util\ArrayUtils;
 use Directus\Validator\Exception\InvalidRequestException;
 use Directus\Validator\Validator;
@@ -31,6 +32,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Zend\Db\Sql\AbstractSql;
 use Zend\Db\Sql\Ddl\AlterTable;
 use Zend\Db\Sql\Ddl\Column\AbstractLengthColumn;
+use Zend\Db\Sql\Ddl\Column\AbstractPrecisionColumn;
 use Zend\Db\Sql\Ddl\Column\BigInteger;
 use Zend\Db\Sql\Ddl\Column\Binary;
 use Zend\Db\Sql\Ddl\Column\Blob;
@@ -179,7 +181,8 @@ class SchemaFactory
     public function createColumn($name, array $data)
     {
         $this->validate($data);
-        $type = $this->schemaManager->getDataType(ArrayUtils::get($data, 'type'));
+        $type = ArrayUtils::get($data, 'type');
+        $dataType = isset($data['datatype']) ? $data['datatype'] : $type;
         $autoincrement = ArrayUtils::get($data, 'auto_increment', false);
         $unique = ArrayUtils::get($data, 'unique', false);
         $primaryKey = ArrayUtils::get($data, 'primary_key', false);
@@ -190,7 +193,7 @@ class SchemaFactory
         $note = ArrayUtils::get($data, 'note');
         // ZendDB doesn't support encoding nor collation
 
-        $column = $this->createColumnFromType($name, $type);
+        $column = $this->createColumnFromType($name, $dataType);
         $column->setNullable($nullable);
         $column->setDefault($default);
         $column->setOption('comment', $note);
@@ -204,7 +207,11 @@ class SchemaFactory
         }
 
         // CollectionLength are SET or ENUM data type
-        if ($column instanceof AbstractLengthColumn || $column instanceof CollectionLength) {
+        if ($column instanceof AbstractPrecisionColumn) {
+            $parts = !is_array($length) ? explode(',', $length) : $length;
+            $column->setDigits($parts[0]);
+            $column->setDecimal(isset($parts[1]) ? $parts[1] : 0);
+        } else if ($column instanceof AbstractLengthColumn || $column instanceof CollectionLength) {
             $column->setLength($length);
         } else {
             $column->setOption('length', $length);
@@ -276,7 +283,6 @@ class SchemaFactory
             case DataTypes::TYPE_UUID:
                 $column = new Uuid($name);
                 break;
-            case DataTypes::TYPE_CSV:
             case DataTypes::TYPE_ARRAY:
                 $column = new Varchar($name);
                 break;

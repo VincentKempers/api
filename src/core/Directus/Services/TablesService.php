@@ -11,6 +11,7 @@ use Directus\Database\Exception\CollectionAlreadyExistsException;
 use Directus\Database\Exception\CollectionNotFoundException;
 use Directus\Database\Exception\InvalidFieldException;
 use Directus\Database\Exception\ItemNotFoundException;
+use Directus\Database\Exception\UnknownDataTypeException;
 use Directus\Database\RowGateway\BaseRowGateway;
 use Directus\Database\Schema\DataTypes;
 use Directus\Database\Schema\Object\Collection;
@@ -54,7 +55,10 @@ class TablesService extends AbstractService
 
         $result = $tableGateway->getItems($params);
 
-        $result['data'] = $this->mergeSchemaCollections($result['data']);
+        $result['data'] = $this->mergeMissingSchemaCollections(
+            $this->getSchemaManager()->getCollectionsName(),
+            $result['data']
+        );
 
         return $result;
     }
@@ -273,7 +277,7 @@ class TablesService extends AbstractService
     public function createTable($name, array $data = [], array $params = [])
     {
         if (!$this->getAcl()->isAdmin()) {
-            throw new UnauthorizedException('Authorized to create collections');
+            throw new UnauthorizedException('Unauthorized to create collections');
         }
 
         $this->enforcePermissions($this->collection, $data, $params);
@@ -283,7 +287,8 @@ class TablesService extends AbstractService
         $collectionsCollectionObject = $this->getSchemaManager()->getCollection($collectionsCollectionName);
         $constraints = $this->createConstraintFor($collectionsCollectionName, $collectionsCollectionObject->getFieldsName());
 
-        $this->validate($data, array_merge(['fields' => 'array'], $constraints));
+        $this->validate($data, array_merge(['fields' => 'required|array'], $constraints));
+        $this->validateFieldsPayload($name, $data['fields'], false, $params);
 
         if (!$this->isValidName($name)) {
             throw new InvalidRequestException('Invalid collection name');
@@ -387,6 +392,9 @@ class TablesService extends AbstractService
         $constraints = $this->createConstraintFor($this->collection, $collectionsCollectionObject->getFieldsName());
         $data['collection'] = $name;
         $this->validate($data, array_merge(['fields' => 'array'], $constraints));
+        if (ArrayUtils::has($data, 'fields')) {
+            $this->validateFieldsPayload($name, $data['fields'], true, $params);
+        }
 
         $collectionObject = $this->getSchemaManager()->getCollection($name);
         if (!$collectionObject->isManaged()) {
@@ -474,11 +482,7 @@ class TablesService extends AbstractService
 
         $data['field'] = $columnName;
         $data['collection'] = $collectionName;
-        // TODO: Length is required by some data types, which make this validation not working fully for columns
-        // TODO: Create new constraint that validates the column data type to be one of the list supported
-        $collectionObject = $this->getSchemaManager()->getCollection('directus_fields');
-        $constraints = $this->createConstraintFor('directus_fields', $collectionObject->getFieldsName());
-        $this->validate(array_merge($data, ['collection' => $collectionName]), array_merge(['collection' => 'required|string'], $constraints));
+        $this->validateFieldPayload($data, null, $params);
 
         // ----------------------------------------------------------------------------
 
@@ -535,19 +539,9 @@ class TablesService extends AbstractService
 
         $this->enforcePermissions('directus_fields', $data, $params);
 
-        // TODO: Length is required by some data types, which make this validation not working fully for columns
-        // TODO: Create new constraint that validates the column data type to be one of the list supported
-        $this->validate([
-            'collection' => $collectionName,
-            'field' => $fieldName,
-            'payload' => $data
-        ], [
-            'collection' => 'required|string',
-            'field' => 'required|string',
-            'payload' => 'required|array'
-        ]);
-
-        $this->validatePayload('directus_fields', array_keys($data), $data, $params);
+        $data['field'] = $fieldName;
+        $data['collection'] = $collectionName;
+        $this->validateFieldPayload($data, array_keys($data), $params);
 
         // Remove field from data
         ArrayUtils::pull($data, 'field');
@@ -930,7 +924,9 @@ class TablesService extends AbstractService
         $result = false;
 
         foreach ($fields as $field) {
-            if (ArrayUtils::get($field, $attribute) === $value) {
+            // use equal operator instead of identical
+            // to avoid true == 1 or false == 0 comparison
+            if (ArrayUtils::get($field, $attribute) == $value) {
                 $count++;
             }
         }
@@ -1093,6 +1089,63 @@ class TablesService extends AbstractService
     }
 
     /**
+     * @param array $data
+     * @param array|null $fields
+     * @param array $params
+     *
+     * @throws UnprocessableEntityException
+     */
+    protected function validateFieldPayload(array $data, array $fields = null, array $params = [])
+    {
+        // TODO: Create new constraint that validates the column data type to be one of the list supported
+        $this->validatePayload('directus_fields', $fields, $data, $params);
+
+        $type = ArrayUtils::get($data, 'type');
+        $isMultiType = DataTypes::isMultiDataTypeType($type);
+        if ($isMultiType && !ArrayUtils::has($data, 'datatype')) {
+            throw new UnprocessableEntityException(
+                sprintf('type "%s" requires a "datatype" property', $type)
+            );
+        }
+
+        if ($isMultiType) {
+            $type = ArrayUtils::get($data, 'datatype', $type);
+        }
+
+        if ($type && DataTypes::isLengthType($type) && !ArrayUtils::get($data, 'length')) {
+            $fieldName = ArrayUtils::get($data, 'field');
+            $message = 'Missing length';
+
+            if ($fieldName) {
+                $message .= ' for: ' . $fieldName;
+            }
+
+            throw new UnprocessableEntityException($message);
+        }
+
+        if ($type && !DataTypes::exists($type)) {
+            throw new UnknownDataTypeException($type);
+        }
+    }
+
+    /**
+     * @param string $collectionName
+     * @param array $fieldsData
+     * @param bool $update
+     * @param array $params
+     *
+     * @throws UnprocessableEntityException
+     */
+    protected function validateFieldsPayload($collectionName, array $fieldsData, $update, array $params = [])
+    {
+        foreach ($fieldsData as $data) {
+            $fieldsName = $update ? array_keys($data) : null;
+            $data['collection'] = $collectionName;
+            $this->validateFieldPayload($data, $fieldsName, $params);
+        }
+    }
+
+    /**
      * @param array $columns
      *
      * @throws InvalidRequestException
@@ -1170,7 +1223,7 @@ class TablesService extends AbstractService
             try {
                 $collectionsData[] = $this->mergeSchemaCollection($name, []);
             } catch (CollectionNotFoundException $e) {
-                // if the collection doesn't exists don't bother with the exception
+                // if the collection doesn't exist don't bother with the exception
                 // as this is a "filtering" result
                 //  which means getting empty result is okay and expected
             }
@@ -1185,7 +1238,7 @@ class TablesService extends AbstractService
         foreach ($collectionsData as $collectionData) {
             $newData = $this->mergeSchemaCollection($collectionData['collection'], $collectionData);
 
-            // if null the actual table doesn't exists
+            // if null the actual table doesn't exist
             if ($newData) {
                 $newCollectionsData[] = $newData;
             }
@@ -1217,6 +1270,10 @@ class TablesService extends AbstractService
 
             if ($result) {
                 $fieldsData[$key] = $result;
+            } else {
+                // remove field data that doesn't have an actual column
+                // except for alias-type fields
+                unset($fieldsData[$key]);
             }
         }
 
@@ -1241,7 +1298,7 @@ class TablesService extends AbstractService
     {
         $field = $collection->getField(ArrayUtils::get($fieldData, 'field'));
 
-        // if for some reason the field key doesn't exists
+        // if for some reason the field key doesn't exist
         // continue with everything as if nothing has happened
         if (!$field) {
             return null;
@@ -1262,7 +1319,7 @@ class TablesService extends AbstractService
     {
         $tableGateway = $this->getFieldsTableGateway();
         $isNumericType = DataTypes::isNumericType($field->getType());
-        $attributeWhitelist = ['managed', 'default_value', 'primary_key'];
+        $attributeWhitelist = ['managed', 'default_value', 'primary_key', 'length'];
 
         if ($isNumericType) {
             $attributeWhitelist[] = 'signed';
@@ -1290,11 +1347,13 @@ class TablesService extends AbstractService
     protected function unknownFieldsAllowed()
     {
         return [
+            'datatype',
             'default_value',
             'auto_increment',
             'primary_key',
             'unique',
-            'signed'
+            'signed',
+            'length',
         ];
     }
 
@@ -1319,14 +1378,15 @@ class TablesService extends AbstractService
         }
 
         $tableGateway = $this->getCollectionsTableGateway();
-        $attributesName = array_merge($tableGateway->getTableSchema()->getFieldsName(), ['managed', 'fields']);
+        $attributesName = $tableGateway->getTableSchema()->getFieldsName();
 
         $collectionData = array_merge(
             ArrayUtils::pick($collection->toArray(), $attributesName),
             $collectionData
         );
 
-        $collectionData['managed'] = boolval($collectionData['managed']);
+        $collectionData['translation'] = ArrayUtils::get($collectionData, 'translation');
+        $collectionData['icon'] = ArrayUtils::get($collectionData, 'icon');
 
         return $tableGateway->parseRecord($collectionData);
     }

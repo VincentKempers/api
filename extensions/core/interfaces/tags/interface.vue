@@ -8,6 +8,7 @@
     <div class="buttons">
       <button
         v-for="(value, index) in valueArray"
+        :key="index"
         @click.prevent="removeTag(index)"
         >{{value}}</button>
     </div>
@@ -15,8 +16,7 @@
 </template>
 
 <script>
-import meta from './meta.json';
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -26,8 +26,8 @@ export default {
         return [];
       }
 
-      if (typeof this.value === 'string') {
-        const array = this.value.split(',');
+      if (typeof this.value === "string") {
+        const array = this.value.split(",");
 
         if (this.options.wrap) {
           array.pop();
@@ -38,14 +38,14 @@ export default {
       }
 
       return this.value;
-    },
+    }
   },
   methods: {
     onInput(event) {
-      if (event.target.value && event.key === 'Enter' || event.key === ',') {
+      if ((event.target.value && event.key === "Enter") || event.key === ",") {
         event.preventDefault();
         this.addTag(event.target.value);
-        event.target.value = '';
+        event.target.value = "";
       }
     },
     addTag(tag) {
@@ -58,7 +58,7 @@ export default {
       tag = tag.trim();
 
       if (this.options.sanitize) {
-        tag = tag.replace(/([^a-z0-9]+)/gi, '-').replace(/^-|-$/g, '');
+        tag = tag.replace(/([^a-z0-9]+)/gi, "-").replace(/^-|-$/g, "");
       }
 
       if (tag.length > 0) tags.push(tag);
@@ -75,16 +75,16 @@ export default {
       this.emitValue(tags);
     },
     emitValue(tags) {
-      let value = tags.join(',');
+      let value = tags.join(",");
 
       if (value && this.options.wrap) {
         value = `,${value},`;
       }
 
-      this.$emit('input', value);
-    },
-  },
-}
+      this.$emit("input", value);
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -25,14 +25,14 @@ export default {
       if (!this.value) return;
       const ISOString = this.date.toISOString();
       return ISOString.substring(0, ISOString.length - 1);
-    },
+    }
   },
   methods: {
     updateValue(value) {
-      this.$emit('input', this.$helpers.date.dateToSql(new Date(value)));
-    },
-  },
-}
+      this.$emit("input", this.$helpers.date.dateToSql(new Date(value)));
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>

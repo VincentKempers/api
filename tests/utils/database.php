@@ -148,6 +148,10 @@ function drop_table(Connection $db, $table)
     delete_item($db, 'directus_collections', [
         'collection' => $table
     ]);
+
+    delete_item($db, 'directus_fields', [
+        'collection' => $table
+    ]);
 }
 
 /**
@@ -181,4 +185,23 @@ function reset_table_id(Connection $db, $table, $nextId)
     ));
 
     reset_autoincrement($db, $table, $nextId);
+}
+
+/**
+ * Returns the table record count
+ *
+ * @param Connection $db
+ * @param string $table
+ *
+ * @return int
+ */
+function table_count(Connection $db, $table)
+{
+    $gateway = new \Zend\Db\TableGateway\TableGateway($table, $db);
+    $select = $gateway->getSql()->select();
+    $select->columns(array('count' => new \Zend\Db\Sql\Expression('COUNT(*)')));
+
+    $result = $gateway->selectWith($select);
+
+    return (int) $result->current()->count;
 }

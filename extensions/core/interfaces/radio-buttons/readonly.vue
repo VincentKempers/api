@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -14,7 +14,7 @@ export default {
       }
 
       return this.value;
-    },
-  },
+    }
+  }
 };
 </script>

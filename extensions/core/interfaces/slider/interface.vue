@@ -11,12 +11,12 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
-  name: 'interface-slider',
-  mixins: [mixin],
-}
+  name: "interface-slider",
+  mixins: [mixin]
+};
 </script>
 
 <style lang="scss" scoped>

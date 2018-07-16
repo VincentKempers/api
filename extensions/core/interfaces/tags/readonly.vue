@@ -2,22 +2,23 @@
   <div class="buttons no-wrap">
     <span
       v-for="(value, index) in displayValue"
+      :key="index"
       >{{value}}</span>
   </div>
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
   computed: {
     displayValue() {
       if (Boolean(this.value) === false) {
-        return '';
+        return "";
       }
 
-      let value = this.value.split(',');
+      let value = this.value.split(",");
 
       if (this.options.wrap) {
         value.pop();
@@ -29,8 +30,8 @@ export default {
       }
 
       return value;
-    },
-  },
+    }
+  }
 };
 </script>
 

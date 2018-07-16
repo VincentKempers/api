@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -18,17 +18,21 @@ export default {
     return {
       valid: null,
       lastValue: this.value,
-      processedValue: this.value,
+      processedValue: this.value
     };
   },
   watch: {
     value() {
       try {
-        this.processedValue = JSON.stringify(JSON.parse(this.value), null, this.options.indent);
-      } catch(e) {
-        return '';
+        this.processedValue = JSON.stringify(
+          JSON.parse(this.value),
+          null,
+          this.options.indent
+        );
+      } catch (e) {
+        return "";
       }
-    },
+    }
   },
   methods: {
     updateValue(value) {
@@ -38,15 +42,17 @@ export default {
         try {
           value = JSON.stringify(JSON.parse(value));
           valid = true;
-        } catch (err) {}
+        } catch (err) {
+          return;
+        }
 
         this.valid = valid;
 
         if (valid || value.length === 0) {
-          this.$emit('input', value);
+          this.$emit("input", value);
         }
       } else {
-        this.$emit('input', value);
+        this.$emit("input", value);
       }
     },
     process(event) {
@@ -59,14 +65,14 @@ export default {
       const lastChar = before.trim().slice(-1);
       const nextChar = after.substr(0, 1);
 
-      if (event.key === 'Enter') {
+      if (event.key === "Enter") {
         const previousLine = this.getPreviousLine(value, before);
         const indents = this.getIndents(previousLine);
 
-        let diff = nextChar === '}' ? -1 : 0;
+        let diff = nextChar === "}" ? -1 : 0;
 
-        if (lastChar === '{' || lastChar === '[') {
-          diff = nextChar === '}' || nextChar === ']' ? 0 : 1;
+        if (lastChar === "{" || lastChar === "[") {
+          diff = nextChar === "}" || nextChar === "]" ? 0 : 1;
           this.addIndent(before, after, indents + diff);
         }
 
@@ -77,18 +83,18 @@ export default {
         event.preventDefault();
       }
 
-      if (event.key === '}' || event.key === ']') {
+      if (event.key === "}" || event.key === "]") {
         this.removeIndent(before, after);
       }
     },
     getPreviousLine(value, before) {
       const lines = value.split(/\n/g);
       const line = before.trimRight().split(/\n/g).length - 1;
-      return lines[line] || '';
+      return lines[line] || "";
     },
     getIndents(line) {
       const indent = this.options.indent;
-      const regex = new RegExp(`^(${indent}+)`, 'g');
+      const regex = new RegExp(`^(${indent}+)`, "g");
       const match = line.match(regex);
       return (match && match[0].length / indent.length) || 0;
     },
@@ -97,7 +103,7 @@ export default {
 
       const textarea = this.$refs.textarea;
       const indent = this.options.indent;
-      const newValue = before + '\n' + indent.repeat(num) + after;
+      const newValue = before + "\n" + indent.repeat(num) + after;
 
       this.processedValue = newValue;
       this.lastValue = newValue;
@@ -121,8 +127,8 @@ export default {
       textarea.selectionStart = selection;
       textarea.selectionEnd = selection;
     }
-  },
-}
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -160,11 +166,9 @@ textarea {
 
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus
-  input:-webkit-autofill,
+  input:-webkit-autofill:focus input:-webkit-autofill,
   textarea:-webkit-autofill,
-  textarea:-webkit-autofill:hover
-  textarea:-webkit-autofill:focus {
+  textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus {
     border: var(--input-border-width) solid var(--lighter-gray);
     background-color: var(--white);
     box-shadow: inset 0 0 0 2000px var(--white);

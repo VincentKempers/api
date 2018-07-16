@@ -75,7 +75,7 @@ class MySQLSchema extends AbstractSchema
                 'single' => new Expression('IFNULL(`DT`.`single`, 0)'),
                 'item_name_template',
                 'preview_url',
-                'managed' => new Expression('IF(ISNULL(`DT`.`collection`), 0, 1)')
+                'managed' => new Expression('IF(ISNULL(`DT`.`collection`), 0, `DT`.`managed`)')
             ],
             $select::JOIN_LEFT
         );
@@ -154,7 +154,7 @@ class MySQLSchema extends AbstractSchema
             'collection' => 'TABLE_NAME',
             'field' => 'COLUMN_NAME',
             'sort' => new Expression('IFNULL(DF.sort, SF.ORDINAL_POSITION)'),
-            'original_type' => new Expression('UCASE(SF.DATA_TYPE)'),
+            'datatype' => new Expression('UCASE(SF.DATA_TYPE)'),
             'key' => 'COLUMN_KEY',
             'unique' => new Expression('IF(SF.COLUMN_KEY="UNI",1,0)'),
             'primary_key' => new Expression('IF(SF.COLUMN_KEY="PRI",1,0)'),
@@ -209,7 +209,7 @@ class MySQLSchema extends AbstractSchema
             'collection',
             'field',
             'sort',
-            'original_type' => new Expression('NULL'),
+            'datatype' => new Expression('NULL'),
             'key' => new Expression('NULL'),
             'unique' => new Expression('NULL'),
             'primary_key' => new Expression('NULL'),
@@ -323,6 +323,8 @@ class MySQLSchema extends AbstractSchema
 
         $where = $selectOne->where->nest();
         $where->equalTo('collection_a', $collectionName);
+        $where->OR;
+        $where->equalTo('junction_collection', $collectionName);
         $where->OR;
         $where->equalTo('collection_b', $collectionName);
         $where->unnest();

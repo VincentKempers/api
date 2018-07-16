@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -20,16 +20,16 @@ export default {
 
       if (!choices) return {};
 
-      if (typeof this.options.choices === 'string') {
+      if (typeof this.options.choices === "string") {
         choices = JSON.parse(this.options.choices);
       }
 
       return choices;
     },
     width() {
-      if (!this.choices) return 'medium';
+      if (!this.choices) return "medium";
 
-      let longestValue= '';
+      let longestValue = "";
       Object.values(this.choices).forEach(choice => {
         if (choice.length > longestValue.length) {
           longestValue = choice;
@@ -38,15 +38,19 @@ export default {
 
       const length = longestValue.length;
 
-      if (length <= 7) return 'x-small';
-      else if (length > 7 && length <= 25) return 'small';
-      else return 'medium';
-    },
-  },
-}
+      if (length <= 7) return "x-small";
+      else if (length > 7 && length <= 25) return "small";
+      else return "medium";
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
+.v-select {
+  margin-top: 0;
+}
+
 .x-small {
   max-width: var(--width-x-small);
 }

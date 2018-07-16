@@ -6,28 +6,28 @@
       :name="name"
       :value="key"
       :key="key"
-      :modelValue="value"
+      :model-value="value"
       :label="$t(options.name)"
-      @change="$emit('input', $event)" />
+      @change="$emit('input', $event)"></v-radio>
   </div>
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
-  name: 'interface-status',
+  name: "interface-status",
   mixins: [mixin],
   computed: {
     optionValues() {
-      if (typeof this.options.statusMapping === 'string') {
-       return this.options.statusMapping ? JSON.parse(this.statusMapping) : {};
+      if (typeof this.options.statusMapping === "string") {
+        return this.options.statusMapping ? JSON.parse(this.statusMapping) : {};
       }
 
       return this.options.statusMapping || {};
-    },
-  },
-}
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -36,6 +36,5 @@ export default {
   grid-auto-flow: column;
   grid-auto-columns: max-content;
   grid-gap: 20px;
-  padding: 20px 0;
 }
 </style>

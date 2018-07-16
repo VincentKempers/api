@@ -11,20 +11,20 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
   data() {
     return {
-      error: null,
+      error: null
     };
   },
   methods: {
     handleImageError(error) {
       this.error = error;
-    },
-  },
+    }
+  }
 };
 </script>
 

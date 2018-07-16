@@ -89,7 +89,9 @@ export default {
       this.loading = true;
       Promise.all([
         this.$api.getFields(this.relationship.collection),
-        this.$api.getItems(this.relationship.collection, { fields: "*.*" })
+        this.$api.getItems(this.relationship.collection, {
+          fields: "*.*"
+        })
       ])
         .then(([fields, items]) => {
           this.loading = false;

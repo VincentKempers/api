@@ -3,16 +3,17 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
-  name: 'readonly-checkboxes',
+  name: "readonly-checkboxes",
   mixins: [mixin],
   computed: {
     selection() {
       if (this.value == null) return [];
 
-      const selection = this.type === 'VARCHAR' ? this.value.split(',') : this.value;
+      const selection =
+        this.type === "VARCHAR" ? this.value.split(",") : this.value;
 
       if (this.options.wrap) {
         selection.pop();
@@ -23,11 +24,11 @@ export default {
     },
     displayValue() {
       if (this.options.formatting) {
-        return this.selection.map(val => this.options.choices[val]).join(', ');
+        return this.selection.map(val => this.options.choices[val]).join(", ");
       }
 
-      return this.selection.join(', ');
-    },
-  },
+      return this.selection.join(", ");
+    }
+  }
 };
 </script>

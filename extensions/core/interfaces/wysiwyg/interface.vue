@@ -183,7 +183,7 @@ export default {
 }
 
 .medium-editor-toolbar li .medium-editor-button-first {
-  border-radius: var(--border-radius) 0  0 var(--border-radius);
+  border-radius: var(--border-radius) 0 0 var(--border-radius);
 }
 
 .medium-editor-toolbar li .medium-editor-button-last {

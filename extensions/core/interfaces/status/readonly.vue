@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -19,7 +19,7 @@ export default {
       return {
         backgroundColor: `var(--${this.currentStatus.background_color})`,
         color: `var(--${this.currentStatus.text_color})`
-      }
+      };
     }
   }
 };
@@ -32,7 +32,6 @@ export default {
   display: inline-block;
   cursor: default;
   max-width: 120px;
-
 }
 .simple {
   border-radius: 100%;

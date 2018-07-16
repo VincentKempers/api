@@ -14,6 +14,7 @@
     >{{options.placeholder}}</option>
     <option
       v-for="(display, val) in options.choices"
+      :key="val"
       :value="val"
       :selected="value && value.includes(val)"
     >{{display}}</option>
@@ -21,7 +22,7 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
   mixins: [mixin],
@@ -31,16 +32,16 @@ export default {
 
       if (!choices) return {};
 
-      if (typeof this.options.choices === 'string') {
+      if (typeof this.options.choices === "string") {
         choices = JSON.parse(this.options.choices);
       }
 
       return choices;
     },
     width() {
-      if (!this.choices) return 'medium';
+      if (!this.choices) return "medium";
 
-      let longestValue= '';
+      let longestValue = "";
       Object.values(this.choices).forEach(choice => {
         if (choice.length > longestValue.length) {
           longestValue = choice;
@@ -49,10 +50,10 @@ export default {
 
       const length = longestValue.length;
 
-      if (length <= 7) return 'x-small';
-      else if (length > 7 && length <= 25) return 'small';
-      else return 'medium';
-    },
+      if (length <= 7) return "x-small";
+      else if (length > 7 && length <= 25) return "small";
+      else return "medium";
+    }
   },
   methods: {
     updateValue(options) {
@@ -65,10 +66,10 @@ export default {
         value = `,${value},`;
       }
 
-      this.$emit('input', value);
-    },
-  },
-}
+      this.$emit("input", value);
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -76,7 +77,7 @@ export default {
   border: var(--input-border-width) solid var(--light-gray);
   border-radius: var(--border-radius);
   width: 100%;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 
   &:focus {
     border-color: var(--accent);
@@ -89,14 +90,15 @@ export default {
     color: var(--gray);
 
     &:checked {
-      background: var(--accent) linear-gradient(0deg, var(--accent) 0%, var(--accent) 100%);
+      background: var(--accent)
+        linear-gradient(0deg, var(--accent) 0%, var(--accent) 100%);
       position: relative;
       color: var(--white);
       -webkit-text-fill-color: var(--white);
 
       &::after {
-        content: 'check';
-        font-family: 'Material Icons';
+        content: "check";
+        font-family: "Material Icons";
         font-size: 24px;
         position: absolute;
         right: 10px;

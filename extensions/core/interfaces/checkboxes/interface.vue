@@ -13,16 +13,18 @@
 </template>
 
 <script>
-import mixin from '../../../mixins/interface';
+import mixin from "../../../mixins/interface";
 
 export default {
-  name: 'interface-checkboxes',
+  name: "interface-checkboxes",
   mixins: [mixin],
   computed: {
     selection() {
       if (this.value == null) return [];
 
-      const selection = [...(this.type === 'VARCHAR' ? this.value.split(',') : this.value)];
+      const selection = [
+        ...(this.type === "VARCHAR" ? this.value.split(",") : this.value)
+      ];
 
       if (this.options.wrap && selection.length > 2) {
         selection.pop();
@@ -33,7 +35,7 @@ export default {
     }
   },
   methods: {
-    updateValue(val, checked) {
+    updateValue(val) {
       let selection = [...this.selection];
 
       if (selection.includes(val)) {
@@ -44,19 +46,19 @@ export default {
 
       selection.sort();
 
-      selection = selection.join(',');
+      selection = selection.join(",");
 
       if (this.options.wrap && selection.length > 0) {
         selection = `,${selection},`;
       }
 
-      if (this.type === 'CSV') {
-        selection = selection.split(',');
+      if (this.type === "CSV") {
+        selection = selection.split(",");
       }
 
-      this.$emit('input', selection);
-    },
-  },
+      this.$emit("input", selection);
+    }
+  }
 };
 </script>
 

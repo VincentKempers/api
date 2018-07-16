@@ -12,13 +12,13 @@
 </template>
 
 <script>
-import marked from 'marked';
-import mixin from '../../../mixins/interface';
+import marked from "marked";
+import mixin from "../../../mixins/interface";
 
 export default {
   data() {
     return {
-      editor: true,
+      editor: true
     };
   },
   computed: {
@@ -28,10 +28,10 @@ export default {
       }
 
       return this.value;
-    },
+    }
   },
-  mixins: [mixin],
-}
+  mixins: [mixin]
+};
 </script>
 
 <style lang="scss" scoped>
@@ -40,7 +40,8 @@ export default {
   position: relative;
 }
 
-.textarea, .preview {
+.textarea,
+.preview {
   max-width: var(--width-large);
   min-height: 200px;
 }

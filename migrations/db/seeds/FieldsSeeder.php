@@ -128,6 +128,12 @@ class FieldsSeeder extends AbstractSeed
             ],
             [
                 'collection' => 'directus_collections',
+                'field' => 'managed',
+                'type' => \Directus\Database\Schema\DataTypes::TYPE_BOOLEAN,
+                'interface' => 'toggle'
+            ],
+            [
+                'collection' => 'directus_collections',
                 'field' => 'hidden',
                 'type' => \Directus\Database\Schema\DataTypes::TYPE_BOOLEAN,
                 'interface' => 'toggle'
@@ -348,7 +354,7 @@ class FieldsSeeder extends AbstractSeed
             [
                 'collection' => 'directus_files',
                 'field' => 'tags',
-                'type' => \Directus\Database\Schema\DataTypes::TYPE_CSV,
+                'type' => \Directus\Database\Schema\DataTypes::TYPE_ARRAY,
                 'interface' => 'tags'
             ],
             [
@@ -685,13 +691,13 @@ class FieldsSeeder extends AbstractSeed
             [
                 'collection' => 'directus_permissions',
                 'field' => 'explain',
-                'type' => \Directus\Database\Schema\DataTypes::TYPE_BOOLEAN,
-                'interface' => 'toggle'
+                'type' => \Directus\Database\Schema\DataTypes::TYPE_VARCHAR,
+                'interface' => 'text-input'
             ],
             [
                 'collection' => 'directus_permissions',
                 'field' => 'allow_statuses',
-                'type' => \Directus\Database\Schema\DataTypes::TYPE_CSV,
+                'type' => \Directus\Database\Schema\DataTypes::TYPE_ARRAY,
                 'interface' => 'tags'
             ],
             [

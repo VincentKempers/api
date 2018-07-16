@@ -247,6 +247,22 @@ class CoreServicesProvider
                 }
                 return $payload;
             });
+            $emitter->addAction('collection.insert.directus_roles', function ($data) use ($container) {
+                $acl = $container->get('acl');
+                $zendDb = $container->get('database');
+                $privilegesTable = new DirectusPermissionsTableGateway($zendDb, $acl);
+
+                $privilegesTable->insertPrivilege([
+                    'role' => $data['id'],
+                    'collection' => 'directus_users',
+                    'create' => Acl::LEVEL_NONE,
+                    'read' => Acl::LEVEL_FULL,
+                    'update' => Acl::LEVEL_MINE,
+                    'delete' => Acl::LEVEL_NONE,
+                    'read_field_blacklist' => 'token',
+                    'write_field_blacklist' => 'token'
+                ]);
+            });
             $emitter->addFilter('collection.insert:before', function (Payload $payload) use ($container) {
                 $collectionName = $payload->attribute('collection_name');
                 $collection = SchemaService::getCollection($collectionName);
@@ -312,7 +328,18 @@ class CoreServicesProvider
                     $recordData = $files->saveData($payload['data'], $payload['filename'], $replace);
                 }
 
-                $payload->replace(array_merge($recordData, ArrayUtils::omit($data, 'filename')));
+                // NOTE: Use the user input title, tags, description and location when exists.
+                $recordData = array_merge(
+                    $recordData,
+                    ArrayUtils::pick($data, [
+                        'title',
+                        'tags',
+                        'description',
+                        'location',
+                    ])
+                );
+
+                $payload->replace($recordData);
                 $payload->remove('data');
                 $payload->remove('html');
                 if (!$replace) {
@@ -374,12 +401,29 @@ class CoreServicesProvider
                     $key = $field->getName();
                     $value = $data[$key];
 
+                    // convert string to array
+                    $decodeFn = function ($value) {
+                        // if empty string, empty array, null or false
+                        if (empty($value) && !is_numeric($value)) {
+                            $value = [];
+                        } else {
+                            $value = !is_array($value) ? explode(',', $value) :  $value;
+                        }
+
+                        return $value;
+                    };
+
+                    // convert array into string
+                    $encodeFn = function ($value) {
+                        return is_array($value) ? implode(',', $value) : $value;
+                    };
+
                     // NOTE: If the array has value with comma it will be treat as a separate value
                     // should we encode the commas to "hide" the comma when splitting the values?
                     if ($decode) {
-                        $value = !is_array($value) ? explode(',', $value) :  $value;
+                        $value = $decodeFn($value);
                     } else {
-                        $value = is_array($value) ? implode(',', $value) : $value;
+                        $value = $encodeFn($value);
                     }
 
                     $data[$key] = $value;

@@ -4,6 +4,7 @@ namespace Directus\Services;
 
 use Directus\Authentication\Exception\ExpiredRequestTokenException;
 use Directus\Authentication\Exception\InvalidRequestTokenException;
+use Directus\Authentication\Exception\UserInactiveException;
 use Directus\Authentication\Sso\AbstractSocialProvider;
 use Directus\Authentication\Exception\ExpiredResetPasswordToken;
 use Directus\Authentication\Exception\InvalidResetPasswordTokenException;
@@ -269,7 +270,7 @@ class AuthService extends AbstractService
 
         /** @var Provider $auth */
         $auth = $this->container->get('auth');
-        $user = $auth->getUserProvider()->findWhere([
+        $user = $auth->findUserWithConditions([
             'id' => $payload->id
         ]);
 

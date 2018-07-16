@@ -115,6 +115,24 @@ class Provider
     }
 
     /**
+     * Finds a user with the given conditions
+     *
+     * @param array $conditions
+     * @return User\User
+     *
+     * @throws UserInactiveException
+     * @throws UserNotFoundException
+     */
+    public function findUserWithConditions(array $conditions)
+    {
+        $user = $this->userProvider->findWhere($conditions);
+
+        $this->validateUser($user);
+
+        return $user;
+    }
+
+    /**
      * Returns a user if the credentials matches
      *
      * @param string $email
@@ -126,7 +144,11 @@ class Provider
      */
     public function findUserWithCredentials($email, $password)
     {
-        $user = $this->findUserWithEmail($email);
+        try {
+            $user = $this->findUserWithEmail($email);
+        } catch (UserWithEmailNotFoundException $e) {
+            throw new InvalidUserCredentialsException();
+        }
 
         // Verify that the user has an id (exists), it returns empty user object otherwise
         if (!password_verify($password, $user->get('password'))) {
@@ -146,14 +168,16 @@ class Provider
      *
      * @return User\User
      *
-     * @throws UserNotFoundException
+     * @throws UserWithEmailNotFoundException
      */
     public function findUserWithEmail($email)
     {
         $user = $this->userProvider->findByEmail($email);
 
-        if (!$user || !$user->getId()) {
-            throw new UserNotFoundException();
+        try {
+            $this->validateUser($user);
+        } catch (UserNotFoundException $e) {
+            throw new UserWithEmailNotFoundException($email);
         }
 
         return $user;
@@ -195,7 +219,7 @@ class Provider
             // 'group' => $payload->group
         ];
 
-        $user = $this->userProvider->findWhere($conditions);
+        $user = $this->findUserWithConditions($conditions);
 
         if ($user) {
             $this->setUser($user);
@@ -220,19 +244,18 @@ class Provider
     /**
      * Authenticate an user using a private token
      *
-     * @param $token
+     * @param string $token
      *
      * @return UserInterface
      *
-     * @throws InvalidTokenException
+     * @throws UserInactiveException
      */
     public function authenticateWithPrivateToken($token)
     {
-        $conditions = [
+        $user = $this->findUserWithConditions([
             'token' => $token
-        ];
+        ]);
 
-        $user = $this->userProvider->findWhere($conditions);
         if ($user) {
             $this->setUser($user);
         }
@@ -463,15 +486,28 @@ class Provider
      */
     protected function setUser(UserInterface $user)
     {
-        if (!$user->getId()) {
+        $this->validateUser($user);
+
+        $this->authenticated = true;
+        $this->user = $user;
+    }
+
+    /**
+     * Validates an user object
+     *
+     * @param UserInterface|null $user
+     *
+     * @throws UserInactiveException
+     * @throws UserNotFoundException
+     */
+    protected function validateUser($user)
+    {
+        if (!($user instanceof UserInterface) || !$user->getId()) {
             throw new UserNotFoundException();
         }
 
         if (!$this->isActive($user)) {
             throw new UserInactiveException();
         }
-
-        $this->authenticated = true;
-        $this->user = $user;
     }
 }

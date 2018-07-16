@@ -8,44 +8,47 @@
 </template>
 
 <script>
-import meta from './meta.json';
-import mixin from '../../../mixins/interface';
-import Color from 'color';
+import mixin from "../../../mixins/interface";
+import Color from "color";
 
 export default {
   mixins: [mixin],
   computed: {
     displayValue() {
-      let value = this.options.output === 'hex' ?
-        this.value : (
-          Array.isArray(this.value) ?
-          this.value :
-          this.value.split(',')
-        );
+      let value =
+        this.options.output === "hex"
+          ? this.value
+          : Array.isArray(this.value)
+            ? this.value
+            : this.value.split(",");
 
       if (this.options.formatValue === false) {
-        if (Boolean(this.value) === false) {
-          return '';
+        if (Boolean(value) === false) {
+          return "";
         }
 
-        if (this.options.output === 'hex') {
-          return this.value;
+        if (this.options.output === "hex") {
+          return value;
         }
 
-        return this.value.join(', ');
+        return value.join(", ");
       }
 
-      if (this.options.output === 'hex') {
-        return Color(this.value).rgb().string();
+      if (this.options.output === "hex") {
+        return Color(value)
+          .rgb()
+          .string();
       }
 
       try {
-        return Color[this.options.output](this.value).rgb().string();
+        return Color[this.options.output](value)
+          .rgb()
+          .string();
       } catch (err) {
         return null;
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
