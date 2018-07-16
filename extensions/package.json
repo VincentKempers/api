@@ -29,6 +29,7 @@
     "vue-template-compiler": "^2.5.16"
   },
   "dependencies": {
+    "colors.json": "^2.0.0",
     "vue": "^2.5.16",
     "vue-hot-reload-api": "^2.3.0"
   },

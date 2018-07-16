@@ -1,20 +1,13 @@
 {
-    "name": "$t:color",
+    "name": "$t:color-picker",
     "version": "1.0.0",
     "datatypes": {
-        "BOOLEAN": null
+        "VARCHAR": 50
     },
-    "options": {
-        "colors": {
-            "name": "green",
-            "comment": "Choose the active color",
-            "default": "green",
-            "interface": "radio-buttons"
-        }
-    },
+    "options": {},
     "translation": {
         "en-US": {
-            "toggle": "Color picker"
+            "color-picker": "Color picker"
         }
     }
 }
